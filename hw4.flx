@@ -1,0 +1,45 @@
+%{
+#include <stdio.h>
+#include <string.h>
+#include "hw4.h"
+#include "hw4.tab.h"
+#define YY_USER_ACTION yylloc.first_line = yylloc.last_line = yylineno;
+%}
+%option yylineno
+
+DIGIT    [0-9]
+%%
+
+[<] return tOPEN;
+[>] return tCLOSE;
+"/>" return tSELF;
+"</" return tEND;
+[0-9]+  { yylval.value = atoi(yytext); return NUM;}
+class return tCLASS;
+capacity= return tCAPACITY;
+course return tCOURSE;
+meeting return tMEETING;
+item return tITEM;
+crn= return tCRN;
+code= return tCODE;
+type= return tTYPE;
+name= return tNAME;
+section= return tSECTION;
+start= return tSTART;
+day= return tDAY;
+M { yylval.str = strdup(yytext);return tMON;}
+T { yylval.str = strdup(yytext);return tTUE;}
+R { yylval.str = strdup(yytext);return tTHU;}
+constraint return tCONSTRAINT;
+instructor= return tINSTRUCTOR;
+end= return tEND_A;
+'[^']*'	{ yylval.str = strdup(yytext);return STRING;}
+["][^"]*["] {yylval.str = strdup(yytext);return STRING;}
+W { yylval.str = strdup(yytext);return tWED;}
+F { yylval.str = strdup(yytext);return tFRI;}
+{DIGIT}{2}:{DIGIT}{2} {yylval.str=strdup(yytext); return TIME;}
+[\n] {}
+[\t] {}
+[ ] 
+
+%%
