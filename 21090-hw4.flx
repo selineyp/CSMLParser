@@ -1,0 +1,52 @@
+%{
+#include <stdio.h>
+#include <string.h>
+#include "21090-hw4.h"
+#include "21090-hw4.tab.h"
+int meetinglineno=0;
+int classlineno=0;
+int courselineno=0;
+int constraintlineno=0;
+int flip=0;
+int selflip=0;
+%}
+
+%option yylineno
+
+DIGIT    [0-9]
+
+%%
+
+[<] {flip=0;return tOPEN;}
+[>] return tCLOSE;
+"/>" {return tSELF;}
+"</" {flip=1;return tEND;}
+[0-9]+  { yylval.value = atoi(yytext); return NUM;}
+class {if (flip==0)classlineno = yylineno;return tCLASS;}
+capacity= return tCAPACITY;
+course {if (flip==0)courselineno=yylineno;return tCOURSE;}
+meeting {meetinglineno = yylineno;return tMEETING;}
+item return tITEM;
+crn= return tCRN;
+code= return tCODE;
+type= return tTYPE;
+name= return tNAME;
+section= return tSECTION;
+start= return tSTART;
+day= return tDAY;
+M { yylval.str = strdup(yytext);return tMON;}
+T { yylval.str = strdup(yytext);return tTUE;}
+R { yylval.str = strdup(yytext);return tTHU;}
+constraint {constraintlineno=yylineno;return tCONSTRAINT;}
+instructor= return tINSTRUCTOR;
+end= return tEND_A;
+'[^']*'	{ yylval.str = strdup(yytext);return STRING;}
+["][^"]*["] {yylval.str = strdup(yytext);return STRING;}
+W { yylval.str = strdup(yytext);return tWED;}
+F { yylval.str = strdup(yytext);return tFRI;}
+{DIGIT}{2}:{DIGIT}{2} {yylval.str=strdup(yytext); return TIME;}
+[\n] {}
+[\t] {}
+[ ] 
+. {}
+%%
